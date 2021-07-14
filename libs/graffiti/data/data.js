@@ -15,7 +15,6 @@ const data = {
         "top": "779px",
         "left": "29px",
         "rotate": "0",
-        // "radius": "10px 10px 10px 10px",
         "style": 'square'
       }
     },
