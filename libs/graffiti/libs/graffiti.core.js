@@ -9,21 +9,21 @@ class Graffiti {
    * @param {*} [opts={}]
    * @memberof Graffiti
    */
-  constructor(opts = {}, context = null) {
-    if (!context) throw new Error('parent this is required')
-    const sysInfo = utils.getSystemInfo()
+  constructor(canvasId = '', context = null) {
+    if (!canvasId) throw new Error('canvasId this is required')
+    if (!context) throw new Error('parent context is required')
     this.ctx = null
     this.canvasNode = null
-    this.sysInfo = sysInfo
-    this.canvasId = opts.canvasId
+    this.sysInfo = utils.getSystemInfo()
+    this.canvasId = canvasId
     this.query = context.createSelectorQuery()
-    this.dpr = sysInfo.pixelRatio || 2
+    this.dpr = this.sysInfo.pixelRatio || 2
     this.scale = 1;
     this.CANVAS_W = 300
     this.CANVAS_H = 400
     this.DESIGN_W = 750
     this.DESIGN_H = 1000
-    this.data = opts.data
+    this.data = {}
     return this;
   }
   /**
@@ -66,6 +66,12 @@ class Graffiti {
               case 'qrcode':
                 this.drawQrCode(list[i]);
                 break;
+              case 'hollow':
+                this.drawHollow(list[i])
+                break;
+              case 'line':
+                this.drawLine(list[i])
+                break;
               default:
                 break;
             }
@@ -88,12 +94,14 @@ class Graffiti {
       top: 0,
       width: this.DESIGN_W,
       height: this.DESIGN_H,
-      background: '#ffffff'
+      background: '#ffffff',
+      radius: [0, 0, 0, 0]
     }
     // 处理单位
-    opts.width = parseFloat(opts.width);
-    opts.height = parseFloat(opts.height);
     Object.assign(_opts, opts)
+    _opts.width = parseFloat(_opts.width);
+    _opts.height = parseFloat(_opts.height);
+    _opts.radius = utils.formatRadius(_opts)
     this.drawRect(_opts)
     if (_opts.background) {
       this.ctx.fillStyle = _opts.background
@@ -133,6 +141,80 @@ class Graffiti {
     });
   }
   /**
+   * @function drawLine
+   * @description 绘制线条
+   * @param {*} [opts={}]
+   * @memberof Graffiti
+   */
+  drawLine(opts = {}) {
+    let _opts = {
+      lineWidth: 2,
+      left: 0,
+      top: 0,
+      toLeft: 0,
+      toTop: 0,
+      color: "#333333",
+      lineType: 'line',
+      lineCap: "butt", // butt, round and square
+      lineJoin: "miter", //round, bevel and miter
+      lineDash: [5, 5], // 设置虚线偏样式
+      lineDashOffset: 10 // 设置虚线偏移量
+    }
+    Object.assign(_opts, opts.style)
+    console.log('line', _opts)
+    _opts.left = parseFloat(_opts.left)
+    _opts.top = parseFloat(_opts.top)
+    _opts.toLeft = parseFloat(_opts.toLeft)
+    _opts.toTop = parseFloat(_opts.toTop)
+    _opts.lineWidth = parseFloat(_opts.lineWidth)
+    this.ctx.save()
+    this.ctx.strokeStyle = _opts.color
+    this.ctx.lineWidth = _opts.lineWidth
+    if (_opts.lineType === 'dash') {
+      this.ctx.lineCap = _opts.lineCap
+      this.ctx.lineJoin = _opts.lineJoin
+      this.ctx.setLineDash(_opts.lineDash)
+      this.ctx.lineDashOffset = _opts.lineDashOffset
+    }
+    this.ctx.beginPath()
+    this.ctx.moveTo(_opts.left, _opts.top)
+    this.ctx.lineTo(_opts.toLeft, _opts.toTop)
+    this.ctx.closePath()
+    this.ctx.stroke();
+    this.ctx.restore()
+  }
+  /**
+   * @function drawHollow
+   * @description 绘制镂空
+   * @param {*} [opts={}]
+   * @memberof Graffiti
+   */
+  drawHollow(opts = {}) {
+    let _opts = {
+      left: 0,
+      top: 0,
+      width: 30,
+      height: 30,
+      radius: [0, 0, 0, 0],
+    }
+    Object.assign(_opts, opts.style)
+    _opts.left = parseFloat(_opts.left)
+    _opts.top = parseFloat(_opts.top)
+    _opts.width = parseFloat(_opts.width)
+    _opts.height = parseFloat(_opts.height)
+    _opts.radius = utils.formatRadius(_opts)
+    Object.assign(_opts, {
+      border: 0,
+      hollow: true,
+      fill: true,
+      stroke: false,
+      clip: false
+    })
+    this.ctx.save()
+    this.drawRect(_opts)
+    this.ctx.restore()
+  }
+  /**
    * @function drawImage
    * @description 绘制图片
    * @param {*} [opts={}]
@@ -141,36 +223,41 @@ class Graffiti {
    */
   drawImage(opts = {}) {
     let _opts = {
+      image: null,
       width: 100,
       height: 100,
       top: 0,
       left: 0,
       rotate: 0,
-      radius: [30, 30, 0, 0],
-      border: 1,
+      radius: [0, 0, 0, 0],
+      border: 0,
       borderColor: "#ffffff",
       background: '#ffffff',
-      mode: "scaleToFill",
     };
     Object.assign(_opts, opts.style);
     _opts.left = parseFloat(_opts.left)
     _opts.top = parseFloat(_opts.top)
     _opts.width = parseFloat(_opts.width)
     _opts.height = parseFloat(_opts.height)
-    console.log(_opts)
+    _opts.border = parseFloat(_opts.border)
+    _opts.radius = utils.formatRadius(_opts)
     this.ctx.save()
-    this.drawRect({
-      left: _opts.left,
-      top: _opts.top,
-      width: _opts.width,
-      height: _opts.height,
-      border: _opts.border,
-      borderColor: _opts.borderColor,
-      background: _opts.background,
-      radius: _opts.radius,
-      clip: true
-    })
-    this.ctx.drawImage(opts.tmpUrl, _opts.left, _opts.top, _opts.width, _opts.height)
+    if (_opts.radius.findIndex(r => r > 0) > -1) {
+      this.drawRect({
+        left: _opts.left,
+        top: _opts.top,
+        width: _opts.width,
+        height: _opts.height,
+        border: _opts.border,
+        borderColor: _opts.borderColor,
+        background: _opts.background,
+        radius: _opts.radius,
+        clip: true,
+        stroke: false,
+        fill: true
+      })
+    }
+    this.ctx.drawImage(opts.tmpUrl, _opts.left + _opts.border / 2, _opts.top + _opts.border / 2, _opts.width - _opts.border, _opts.height - _opts.border)
     this.ctx.restore()
   }
   /**
@@ -191,7 +278,7 @@ class Graffiti {
       color: '#333333', // 字体颜色
       maxWidth: 200, // 最大宽度
       maxLines: 4, // 最大行数
-      textAlign: 'center', // 左右对齐方式
+      textAlign: 'left', // 左右对齐方式
       textBaseline: 'top', // 垂直对齐方式
       lineHeight: 40, // 行距
     };
@@ -301,18 +388,21 @@ class Graffiti {
       top: 100,
       width: 300,
       height: 500,
-      radius: [30, 30, 30, 30],
+      radius: [0, 0, 0, 0],
       border: 0,
       borderColor: "#ffffff",
       background: '#ffffff',
       hollow: false,
       fill: true,
       stroke: false,
-      drawType: 'fill',
-      clip: true
+      clip: false
     }
-    console.log(opts)
     Object.assign(_opts, opts)
+    _opts.left = parseFloat(_opts.left)
+    _opts.top = parseFloat(_opts.top)
+    _opts.width = parseFloat(_opts.width)
+    _opts.height = parseFloat(_opts.height)
+    _opts.radius = utils.formatRadius(_opts)
     if (_opts.clip) {
       _opts.hollow = false;
     }
@@ -337,6 +427,7 @@ class Graffiti {
       this.ctx.fill()
     }
     if (_opts.stroke) {
+      console.log('borderColor', _opts)
       this.ctx.strokeStyle = _opts.borderColor
       this.ctx.stroke();
     }
@@ -363,7 +454,7 @@ class Graffiti {
       background: "#ffffff", // 背景
       color: "#000000", // 二维码颜色
       radius: [0, 0, 0, 0], // 边框圆角
-      text: "DrawJs Is A Good Tool For You", // 二维码内容
+      text: "Hello Graffiti", // 二维码内容
       correctLevel: QRCode.CorrectLevel.Q, // 容错等级
       style: 'square'
     }
@@ -375,6 +466,7 @@ class Graffiti {
     _opts.left = parseFloat(_opts.left)
     _opts.top = parseFloat(_opts.top)
     _opts.border = parseFloat(_opts.border)
+    _opts.radius = utils.formatRadius(_opts)
     this.ctx.save();
     this.drawRect({
       left: _opts.left,

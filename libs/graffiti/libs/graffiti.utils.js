@@ -55,10 +55,30 @@ function splitString(opts, $this) {
   return strArr;
 }
 
-function formatRadius(str) {
-  return []
+function formatRadius(opts = {}) {
+  if (Array.isArray(opts.radius)) {
+    return opts.radius
+  }
+  let radiusList = (opts.radius.split(' ') || []).map(e => parseFloat(0 + e) > opts.width / 2 ? opts.width / 2 : parseFloat(0 + e))
+  switch (radiusList.length) {
+    case 1:
+      radiusList = [radiusList[0], radiusList[0], radiusList[0], radiusList[0]];
+      break;
+    case 2:
+      radiusList = [radiusList[0], radiusList[1], radiusList[0], radiusList[1]];
+      break;
+    case 3:
+      radiusList = [radiusList[0], radiusList[1], radiusList[2], radiusList[1]];
+      break;
+    case 4:
+      radiusList = [radiusList[0], radiusList[1], radiusList[2], radiusList[3]];
+      break;
+    default:
+      radiusList = [0, 0, 0, 0];
+      break;
+  }
+  return radiusList;
 }
-
 
 export default {
   getSystemInfo,

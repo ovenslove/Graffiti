@@ -46,9 +46,7 @@ Component({
     attached: function () {
       console.log('graffiti-加载成功')
       this.setData({
-        graffiti: new Graffiti({
-          canvasId: this.data.canvasId,
-        }, this).init(this.data.config || demoData)
+        graffiti: new Graffiti(this.data.canvasId, this).init(this.data.config || demoData)
       })
       console.log(this.data.graffiti)
     },

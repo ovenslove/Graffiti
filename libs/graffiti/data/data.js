@@ -1,21 +1,60 @@
 const data = {
   "width": "654px",
   "height": "1010px",
-  "background": "#f5f5f5",
+  "background": "#eeeeee",
+  "radius": "30px 30px 10px 10px",
   "views": [{
       "type": "qrcode",
       "text": "https://developers.weixin.qq.com/community/develop/doc/000804d9df47b0dea489005d656800",
       "style": {
-        "color": "#333333",
+        "color": "red",
         "background": "#ffffff",
         "border": "15px",
-        "borderColor":"#ffffff",
+        "borderColor": "#ffffff",
         "width": "200px",
         "height": "200px",
         "top": "779px",
         "left": "29px",
         "rotate": "0",
-        "style": 'square'
+        "style": 'circle',
+        "radius": "10px"
+      }
+    },
+    {
+      "type": "hollow",
+      "style": {
+        "width": "40px",
+        "height": "40px",
+        "top": "500px",
+        "left": "-20px",
+        "rotate": "0",
+        "radius": "20px 20px 20px 20px",
+      }
+    },
+    {
+      "type": "line",
+      "style": {
+        lineWidth: 4,
+        left: "30px",
+        top: "520px",
+        toLeft: "624px",
+        toTop: "520px",
+        color: "#dddddd",
+        lineType:'dash',
+        lineCap: "butt", // butt, round and square
+        lineJoin: "miter", //round, bevel and miter
+        lineDash: [5, 15], // 设置虚线偏样式
+        lineDashOffset: 10.0 // 设置虚线偏移量
+      }
+    },
+    {
+      "type": "hollow",
+      "style": {
+        "width": "40px",
+        "height": "40px",
+        "top": "500px",
+        "left": "634px",
+        "radius": "20px 20px 20px 20px",
       }
     },
     {
@@ -155,12 +194,10 @@ const data = {
         "width": "654px",
         "height": "475.27px",
         "top": "0px",
-        "left": "0",
-        "rotate": "0",
-        "borderRadius": "",
-        "borderWidth": "",
-        "borderColor": "#000000",
-        "shadow": "",
+        "left": "0px",
+        "rotate": "0deg",
+        "radius": "30px 30px 0 0",
+        "background": "#f5f5f5",
         "mode": "scaleToFill"
       }
     },
