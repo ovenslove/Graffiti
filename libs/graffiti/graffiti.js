@@ -1,7 +1,7 @@
 // libs/graffiti/graffiti.js
 import _ from './libs/graffiti.utils'
 import Graffiti from './libs/graffiti.core'
-import demoData from './data/data'
+import demoData from './data/data1'
 Component({
   /**
    * 组件的属性列表
@@ -48,7 +48,7 @@ Component({
       this.setData({
         graffiti: new Graffiti({
           canvasId: this.data.canvasId,
-          debug: true
+          debug: false
         }, this).init(this.data.defaultConfig)
       })
       this.data.graffiti.onReady(() => {
@@ -85,7 +85,6 @@ Component({
   methods: {
     handleSaveImage(e) {
       this.data.graffiti.getImageUrl().then(res => {
-        console.log(res)
         wx.saveImageToPhotosAlbum({
           filePath: res.tempFilePath,
           success(res) {

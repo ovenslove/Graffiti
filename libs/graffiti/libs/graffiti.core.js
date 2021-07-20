@@ -82,7 +82,7 @@ class Graffiti {
         // 初始化默认画板
         this.initDrawingBoard(this.data)
         this.downLoadImage(this.data.views).then(list => {
-          console.log('downLoadImage have been invoked')
+          this.log('downLoadImage have been invoked')
           for (let i in list) {
             switch (list[i].type) {
               case 'text':
@@ -109,12 +109,12 @@ class Graffiti {
           }
           this.onDrewHandle()
         }).catch(err => {
-          console.log(err)
+          this.log(err)
           throw new Error('image download error')
         })
         this.onReadyHandle()
       })
-    console.log('init have been invoked')
+    this.log('init have been invoked')
     return this;
   }
   /**
@@ -159,7 +159,7 @@ class Graffiti {
     _opts.radius = utils.formatRadius(_opts)
     this.drawRect(_opts)
     this.ctx.restore()
-    console.log('initDrawingBoard have been invoked')
+    this.log('initDrawingBoard have been invoked')
     return this
   }
   /**
@@ -170,24 +170,24 @@ class Graffiti {
    * @memberof Graffiti
    */
   downLoadImage(list = []) {
-    let dlist = [];
+    let dList = [];
     for (let i in list) {
       if (list[i].type === 'image') {
-        dlist.push({
+        dList.push({
           index: i,
           handle: downLoad.downLoad(list[i].url, this.canvasNode)
         })
       } else if (list[i].type === 'qrcode' && list[i].logoUrl) {
-        dlist.push({
+        dList.push({
           index: i,
           handle: downLoad.downLoad(list[i].logoUrl, this.canvasNode)
         })
       } else {}
     }
     return new Promise((resolve, reject) => {
-      Promise.all(dlist.map(e => e.handle)).then(res => {
+      Promise.all(dList.map(e => e.handle)).then(res => {
         for (let i in res) {
-          list[dlist[i].index].tmpUrl = res[i]
+          list[dList[i].index].tmpUrl = res[i]
         }
         this.data.views = list;
         resolve(list)
@@ -237,7 +237,7 @@ class Graffiti {
     this.ctx.closePath()
     this.ctx.stroke();
     this.ctx.restore()
-    console.log('drawLine have been invoked')
+    this.log('drawLine have been invoked')
     return this;
   }
   /**
@@ -269,10 +269,10 @@ class Graffiti {
     })
     this.ctx.save()
     this.drawRect(_opts)
-    console.log(_opts)
+    this.log(_opts)
     this.ctx.restore()
-    console.log('drawHollow have been invoked')
-    // return this
+    this.log('drawHollow have been invoked')
+    return this
   }
   /**
    * @function drawImage
@@ -327,7 +327,7 @@ class Graffiti {
     }
     this.ctx.drawImage(opts.tmpUrl, _opts.left, _opts.top, _opts.width, _opts.height)
     this.ctx.restore()
-    console.log('drawImage have been invoked')
+    this.log('drawImage have been invoked')
     return this;
   }
   /**
@@ -346,8 +346,9 @@ class Graffiti {
       fontSize: 32, // 字号大小
       fontFamily: 'webfontzk', // 字体
       color: '#333333', // 字体颜色
-      maxWidth: 200, // 最大宽度
+      width: 200, // 最大宽度
       maxLines: 4, // 最大行数
+      fontWeight: 500, // 字重
       textAlign: 'left', // 左右对齐方式
       textBaseline: 'top', // 垂直对齐方式
       lineHeight: 40, // 行距
@@ -457,7 +458,7 @@ class Graffiti {
     }
     this.ctx.setTransform(1, 0, 0, 1, 0, 0);
     this.ctx.restore();
-    console.log('drawText have been invoked')
+    this.log('drawText have been invoked')
     return this
   }
 
@@ -490,6 +491,7 @@ class Graffiti {
     _opts.top = parseFloat(_opts.top)
     _opts.width = parseFloat(_opts.width)
     _opts.height = parseFloat(_opts.height)
+    _opts.border = parseFloat(_opts.border)
     _opts.radius = utils.formatRadius(_opts)
     if (_opts.border > 0) {
       this.drawRect({
@@ -537,7 +539,7 @@ class Graffiti {
     if (_opts.clip) {
       this.ctx.clip()
     }
-    console.log('drawRect have been invoked')
+    this.log('drawRect have been invoked')
     return this;
   }
   /**
@@ -650,20 +652,31 @@ class Graffiti {
       })
     }
     this.ctx.restore();
-    console.log('drawQrCode have been invoked')
+    this.log('drawQrCode have been invoked')
     return this;
   }
-  getDrewData() {
-    return this.canvasNode.toDataURL('image/png', 1);
+  /**
+   * @function getDrewData
+   * @description 获取画板数据（base64格式）
+   * @param {number} [quality=1]
+   * @returns
+   * @memberof Graffiti
+   */
+  getDrewData(quality = 1) {
+    return this.canvasNode.toDataURL('image/png', quality);
   }
+  /**
+   * @function getImageUrl
+   * @description 导出图片并获取临时地址
+   * @returns
+   * @memberof Graffiti
+   */
   getImageUrl() {
-    let that = this;
     let imageData = this.getDrewData()
     return new Promise((resolve, reject) => {
       let fileManager = wx.getFileSystemManager();
       let fileName = Math.random() + '-' + Date.now() + '.png';
       let filePath = wx.env.USER_DATA_PATH + '/canvas-' + fileName
-      console.log(filePath)
       fileManager.writeFile({
         filePath: filePath,
         data: imageData.slice(22),
@@ -683,6 +696,16 @@ class Graffiti {
         }
       })
     });
+  }
+  /**
+   * @function log
+   * @description 日志输出
+   * @memberof Graffiti
+   */
+  log() {
+    if (this.debug) {
+      console.log(...arguments)
+    }
   }
 }
 

@@ -27,7 +27,6 @@ const data = {
         left: '20px',
         top: '268px',
         width: "192px",
-        height: "44px",
         textIndent: "2",
         maxLines: "2",
         fontSize: "16px",
@@ -59,7 +58,9 @@ const data = {
         width: "28px",
         height: "16px",
         background: "#D6AD80",
-        radius: "1px 5px 1px 1px"
+        radius: "1px 5px 1px 1px",
+        border: "0px",
+        borderColor: "#ffffff"
       }
     },
     {
@@ -96,7 +97,7 @@ const data = {
         top: "20px",
         width: "280px",
         height: "224px",
-        border: "0px",
+        border: "10px",
         radius: "0 10px 0 0"
       }
     }
