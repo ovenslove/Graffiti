@@ -255,7 +255,7 @@ this.data.graffiti.onDrew(() => {
            "width": "28px",
            "height": "16px",
            "radius": "1px 5px 1px 1px",
-         	"border": "0px"
+         	"border": "0px",
          	"borderColor": "#FFFFFF",
            "background": "#D6AD80"
        }
@@ -299,7 +299,7 @@ this.data.graffiti.onDrew(() => {
            "border": "10px",
            "borderColor": "#ffffff",
            "radius": "10px",
-         	"correctLevel": "Q"
+         	"correctLevel": "Q",
            "style": "circle",
        }
    }
