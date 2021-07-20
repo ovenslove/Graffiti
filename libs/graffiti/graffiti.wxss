@@ -2,3 +2,6 @@
 .canvas__container{
     /* background: #333333; */
 }
+.graffiti__btn{
+    margin-top: 30rpx;
+}

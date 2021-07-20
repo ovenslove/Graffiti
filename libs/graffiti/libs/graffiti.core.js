@@ -42,7 +42,7 @@ class Graffiti {
     this.context = context;
     this.debug = opts.debug || false
     this.query = context.createSelectorQuery()
-    this.dpr = (this.sysInfo.pixelRatio || 2) * 2
+    this.dpr = this.sysInfo.pixelRatio || 2 // 微信移动端canvas画布最大分辨率4096x4096
     this.scale = 1;
     this.CANVAS_W = 300
     this.CANVAS_H = 400

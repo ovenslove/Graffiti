@@ -11,7 +11,7 @@ const data = {
       "style": {
         "color": "red",
         "background": "#ffffff",
-        "border": "15px",
+        "border": "10px",
         "borderColor": "#ffffff",
         "width": "200px",
         "height": "200px",

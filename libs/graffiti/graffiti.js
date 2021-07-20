@@ -90,6 +90,16 @@ Component({
           filePath: res.tempFilePath,
           success(res) {
             console.log(res)
+            wx.showToast({
+              title: '保存成功',
+              icon: 'success',
+              image: '',
+              duration: 1500,
+              mask: false,
+              success: (result) => {},
+              fail: () => {},
+              complete: () => {}
+            });
           },
           fail(err) {
             console.log(err)
