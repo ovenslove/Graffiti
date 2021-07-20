@@ -46,11 +46,11 @@ this.data.graffiti.onDrew(() => {
 
    ```json
    {
-     width: "320px",
-     height: "375px",
-     background: "#eeeeee",
-     radius: "0px 12px 0px 0px",
-     views: []
+     "width": "320px",
+     "height": "375px",
+     "background": "#eeeeee",
+     "radius": "0px 12px 0px 0px",
+     "views": []
    }
    ```
 
