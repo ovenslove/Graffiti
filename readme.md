@@ -349,7 +349,7 @@ this.data.graffiti.onDrew(() => {
 ### 二次开发
 
 ```bash
-git clone https://e.coding.net/ovenslover/tecs/graffiti.git
+git clone https://github.com/ovenslove/Graffiti.git
 cd graffiti
 # 打开微信开发工具并导入
 ```
