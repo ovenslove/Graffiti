@@ -1,4 +1,4 @@
 /* libs/graffiti/graffiti.wxss */
 .canvas__container{
-    /* background: pink; */
+    /* background: #333333; */
 }

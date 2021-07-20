@@ -151,7 +151,7 @@ const graffiti = new Graffiti(canvasId, this).init(config)
    | correctLevel | 否       | Q              | 二维码纠错等级【L,M,Q,H】 |          |
    | style        | 否       | square         | 二维码点阵样式            |          |
 
-8. Graffiti.getDrawData()
+8. Graffiti.getDrewData()
 
    > 获取画板数据（开发中）
 

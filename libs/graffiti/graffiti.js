@@ -25,7 +25,7 @@ Component({
     },
     height: {
       type: Number,
-      value: 580
+      value: 500
     }
   },
 
@@ -34,7 +34,7 @@ Component({
    */
   data: {
     graffiti: null,
-    defaultConfig: {},
+    defaultConfig: demoData,
   },
   // 数据监听器
   observers: {},
@@ -46,9 +46,17 @@ Component({
     attached: function () {
       console.log('graffiti-加载成功')
       this.setData({
-        graffiti: new Graffiti(this.data.canvasId, this).init(this.data.config || demoData)
+        graffiti: new Graffiti({
+          canvasId: this.data.canvasId,
+          debug: true
+        }, this).init(this.data.defaultConfig)
       })
-      console.log(this.data.graffiti)
+      this.data.graffiti.onReady(() => {
+        console.log('onReady')
+      })
+      this.data.graffiti.onDrew(() => {
+        console.log('onDrew')
+      });
     },
     // 在组件在视图层布局完成后执行	-	1.6.3
     ready() {},
@@ -75,6 +83,20 @@ Component({
    * 组件的方法列表
    */
   methods: {
-
+    handleSaveImage(e) {
+      this.data.graffiti.getImageUrl().then(res => {
+        console.log(res)
+        wx.saveImageToPhotosAlbum({
+          filePath: res.tempFilePath,
+          success(res) {
+            console.log(res)
+          },
+          fail(err) {
+            console.log(err)
+          },
+          complete() {}
+        })
+      })
+    }
   }
 })

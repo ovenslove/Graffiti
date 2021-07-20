@@ -1,11 +1,13 @@
 "use strict"
 
+/**
+ * @function getSystemInfo
+ * @description 获取系统信息
+ * @returns
+ */
 function getSystemInfo() {
   return wx.getSystemInfoSync()
 }
-
-"use strict";
-
 /**
  * @function 角度转化为弧度
  * @param {number} deg
@@ -24,37 +26,13 @@ function trim(str) {
     .replace(/^(\s|\u00A0)+/, '')
     .replace(/(\s|\u00A0)+$/, '');
 }
-/**
- * @function 按照
- * @param {*} opts 
- * @param {*} $this 
- */
-function splitString(opts, $this) {
-  let strArr = [];
-  var lineWidth = 0;
-  let lineText = '';
-  let _opts = {
-    fontSize: 16,
-    text: '',
-    maxWidth: 100,
-  };
-  Object.assign(_opts, opts);
-  $this.ctx.setFontSize(_opts.fontSize);
-  for (let i = 0; i < _opts.text.length; i++) {
-    lineWidth += $this.ctx.measureText(_opts.text[i]).width;
-    lineText += _opts.text[i];
-    if (lineWidth > _opts.maxWidth) {
-      strArr.push(lineText);
-      lineWidth = 0;
-      lineText = '';
-    }
-    if (i == _opts.text.length - 1) { //绘制剩余部分
-      strArr.push(lineText);
-    }
-  }
-  return strArr;
-}
 
+/**
+ * @function formatRadius
+ * @description 格式化圆角参数
+ * @param {*} [opts={}]
+ * @returns []
+ */
 function formatRadius(opts = {}) {
   if (Array.isArray(opts.radius)) {
     return opts.radius
@@ -84,6 +62,5 @@ export default {
   getSystemInfo,
   degree2radian,
   trim,
-  splitString,
   formatRadius
 }

@@ -1,4 +1,5 @@
 <!--libs/graffiti/graffiti.wxml-->
 <view class="graffiti__container">
-  <canvas class="canvas__container" id="{{canvasId}}" type="{{type}}" style="width:{{width}}px;height:{{height}}px;"></canvas>
+  <canvas class="canvas__container" id="{{canvasId}}" type="2d" style="width:{{defaultConfig.width}};height:{{defaultConfig.height}};"></canvas>
+  <button bindtap="handleSaveImage">保存图片</button>
 </view>

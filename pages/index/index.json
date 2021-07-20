@@ -1,4 +1,5 @@
 {
+  "navigationBarTitleText":"测试标题",
   "usingComponents": {
     "graffiti":"../../libs/graffiti/graffiti"
   }

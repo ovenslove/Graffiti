@@ -1,3 +1,26 @@
+/** 
+The MIT License (MIT)
+Copyright (c) 2021 ovenslove
+
+Permission is hereby granted, free of charge, to any person obtaining a copy
+of this software and associated documentation files (the "Software"), to deal
+in the Software without restriction, including without limitation the rights
+to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+copies of the Software, and to permit persons to whom the Software is
+furnished to do so, subject to the following conditions:
+
+The above copyright notice and this permission notice shall be included in all
+copies or substantial portions of the Software.
+
+THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+SOFTWARE.
+*/
+
 "use strict"
 import downLoad from './graffiti.download'
 import utils from './graffiti.utils'
@@ -9,20 +32,24 @@ class Graffiti {
    * @param {*} [opts={}]
    * @memberof Graffiti
    */
-  constructor(canvasId = '', context = null) {
-    if (!canvasId) throw new Error('canvasId this is required')
+  constructor(opts = {}, context = null) {
+    if (!opts.canvasId) throw new Error('canvasId this is required')
     if (!context) throw new Error('parent context is required')
     this.ctx = null
     this.canvasNode = null
     this.sysInfo = utils.getSystemInfo()
-    this.canvasId = canvasId
+    this.canvasId = opts.canvasId
+    this.context = context;
+    this.debug = opts.debug || false
     this.query = context.createSelectorQuery()
-    this.dpr = this.sysInfo.pixelRatio || 2
+    this.dpr = (this.sysInfo.pixelRatio || 2) * 2
     this.scale = 1;
     this.CANVAS_W = 300
     this.CANVAS_H = 400
     this.DESIGN_W = 750
     this.DESIGN_H = 1000
+    this.onReadyHandle = () => {}
+    this.onDrewHandle = () => {}
     this.data = {}
     return this;
   }
@@ -55,6 +82,7 @@ class Graffiti {
         // 初始化默认画板
         this.initDrawingBoard(this.data)
         this.downLoadImage(this.data.views).then(list => {
+          console.log('downLoadImage have been invoked')
           for (let i in list) {
             switch (list[i].type) {
               case 'text':
@@ -72,13 +100,40 @@ class Graffiti {
               case 'line':
                 this.drawLine(list[i])
                 break;
+              case 'rect':
+                this.drawRect(list[i])
+                break;
               default:
                 break;
             }
           }
+          this.onDrewHandle()
+        }).catch(err => {
+          console.log(err)
+          throw new Error('image download error')
         })
+        this.onReadyHandle()
       })
+    console.log('init have been invoked')
     return this;
+  }
+  /**
+   * @function onReady
+   * @description 初始化完成-生命周期
+   * @param {*} [callback=() => {}]
+   * @memberof Graffiti
+   */
+  onReady(callback = () => {}) {
+    this.onReadyHandle = callback
+  }
+  /**
+   * @function onDrew
+   * @description 初始化配置绘制完成-生命周期
+   * @param {*} [callback=() => {}]
+   * @memberof Graffiti
+   */
+  onDrew(callback = () => {}) {
+    this.onDrewHandle = callback
   }
   /**
    * @function initDrawingBoard
@@ -103,11 +158,8 @@ class Graffiti {
     _opts.height = parseFloat(_opts.height);
     _opts.radius = utils.formatRadius(_opts)
     this.drawRect(_opts)
-    if (_opts.background) {
-      this.ctx.fillStyle = _opts.background
-    }
-    this.ctx.fillRect(_opts.left, _opts.top, _opts.width, _opts.height);
     this.ctx.restore()
+    console.log('initDrawingBoard have been invoked')
     return this
   }
   /**
@@ -125,11 +177,15 @@ class Graffiti {
           index: i,
           handle: downLoad.downLoad(list[i].url, this.canvasNode)
         })
-      }
+      } else if (list[i].type === 'qrcode' && list[i].logoUrl) {
+        dlist.push({
+          index: i,
+          handle: downLoad.downLoad(list[i].logoUrl, this.canvasNode)
+        })
+      } else {}
     }
     return new Promise((resolve, reject) => {
       Promise.all(dlist.map(e => e.handle)).then(res => {
-        console.log(res)
         for (let i in res) {
           list[dlist[i].index].tmpUrl = res[i]
         }
@@ -161,7 +217,6 @@ class Graffiti {
       lineDashOffset: 10 // 设置虚线偏移量
     }
     Object.assign(_opts, opts.style)
-    console.log('line', _opts)
     _opts.left = parseFloat(_opts.left)
     _opts.top = parseFloat(_opts.top)
     _opts.toLeft = parseFloat(_opts.toLeft)
@@ -182,6 +237,8 @@ class Graffiti {
     this.ctx.closePath()
     this.ctx.stroke();
     this.ctx.restore()
+    console.log('drawLine have been invoked')
+    return this;
   }
   /**
    * @function drawHollow
@@ -212,7 +269,10 @@ class Graffiti {
     })
     this.ctx.save()
     this.drawRect(_opts)
+    console.log(_opts)
     this.ctx.restore()
+    console.log('drawHollow have been invoked')
+    // return this
   }
   /**
    * @function drawImage
@@ -222,6 +282,13 @@ class Graffiti {
    * @memberof Graffiti
    */
   drawImage(opts = {}) {
+    if (!opts.tmpUrl) {
+      downLoad.downLoad(opts.url, this.canvasNode).then(res => {
+        opts.tmpUrl = res
+        this.drawImage(opts)
+      })
+      return;
+    }
     let _opts = {
       image: null,
       width: 100,
@@ -242,6 +309,7 @@ class Graffiti {
     _opts.border = parseFloat(_opts.border)
     _opts.radius = utils.formatRadius(_opts)
     this.ctx.save()
+    // 裁切圆角图片
     if (_opts.radius.findIndex(r => r > 0) > -1) {
       this.drawRect({
         left: _opts.left,
@@ -257,8 +325,10 @@ class Graffiti {
         fill: true
       })
     }
-    this.ctx.drawImage(opts.tmpUrl, _opts.left + _opts.border / 2, _opts.top + _opts.border / 2, _opts.width - _opts.border, _opts.height - _opts.border)
+    this.ctx.drawImage(opts.tmpUrl, _opts.left, _opts.top, _opts.width, _opts.height)
     this.ctx.restore()
+    console.log('drawImage have been invoked')
+    return this;
   }
   /**
    * @function drawText
@@ -270,7 +340,7 @@ class Graffiti {
   drawText(opts = {}) {
     let text = opts.text || '默认文本'
     // 默认样式
-    let _styles = {
+    let _opts = {
       left: 100, // 坐标x
       top: 100, // 坐标y
       fontSize: 32, // 字号大小
@@ -281,19 +351,30 @@ class Graffiti {
       textAlign: 'left', // 左右对齐方式
       textBaseline: 'top', // 垂直对齐方式
       lineHeight: 40, // 行距
+      textIndent: 0,
+      rotate: 0,
+      rotateOrigin: "left top"
     };
 
-    Object.assign(_styles, opts.style);
+    Object.assign(_opts, opts.style);
+    _opts.textIndent = parseInt(_opts.textIndent)
     this.ctx.save();
     // 文本颜色配置
-    this.ctx.fillStyle = _styles.color
+    this.ctx.fillStyle = _opts.color
     // 设置字体
-    this.ctx.font = `${_styles.fontWeight} ${_styles.fontSize}/${_styles.lineHeight} ${_styles.fontFamily}`;
+    this.ctx.font = `${_opts.fontWeight} ${_opts.fontSize}/${_opts.lineHeight} ${_opts.fontFamily}`;
     // 设置对齐方式
-    this.ctx.textAlign = _styles.textAlign || 'left'
+    this.ctx.textAlign = _opts.textAlign || 'left'
     // 设置基线
-    this.ctx.textBaseline = _styles.textBaseline || 'top'
-
+    this.ctx.textBaseline = _opts.textBaseline || 'top'
+    // 处理textIndent
+    if (_opts.textIndent > 0) {
+      let preIndent = '';
+      for (let i = 0; i < _opts.textIndent; i++) {
+        preIndent += "占"
+      }
+      text = preIndent + text
+    }
     // 换行-匹配到\r\n
     let textList = text.split(/[\n]/g) || []
     let textAllList = []
@@ -304,7 +385,7 @@ class Graffiti {
       let _tmpList = []
       let _tmpStr = ''
       for (let j in tmpTextList) {
-        if (Math.ceil(this.ctx.measureText(_tmpStr + tmpTextList[j]).width) > parseInt(_styles.width)) {
+        if (Math.ceil(this.ctx.measureText(_tmpStr + tmpTextList[j]).width) > parseInt(_opts.width)) {
           if (_tmpStr) {
             _tmpList.push(_tmpStr);
           }
@@ -317,8 +398,8 @@ class Graffiti {
       textAllList.push(..._tmpList)
     }
     // 处理省略号
-    if (textAllList.length > _styles.maxLines) {
-      textAllList.splice(_styles.maxLines, textAllList.length)
+    if (textAllList.length > _opts.maxLines) {
+      textAllList.splice(_opts.maxLines, textAllList.length)
       // 处理最后一行添加...
       let ellipsisLength = Math.ceil(this.ctx.measureText('...').width)
       let lastTextArr = textAllList[textAllList.length - 1].split('')
@@ -333,9 +414,9 @@ class Graffiti {
       textAllList[textAllList.length - 1] = lastTextArr.join('')
     }
     // 计算文本垂直偏移量（行距）
-    let lineHeight = parseFloat(_styles.lineHeight)
+    let lineHeight = parseFloat(_opts.lineHeight)
     // 处理旋转中心
-    let rotateOrigin = _styles.rotateOrigin && _styles.rotateOrigin.split(' ') || [0, 0]
+    let rotateOrigin = Array.isArray(_opts.rotateOrigin) ? _opts.rotateOrigin : (_opts.rotateOrigin && _opts.rotateOrigin.split(' ') || [0, 0])
     rotateOrigin = rotateOrigin.map(e => {
       if (/[\d]%/g.test(e)) {
         return parseFloat(e) / 100
@@ -359,17 +440,24 @@ class Graffiti {
       }
     })
     // 旋转偏移量
-    let offsetWidth = parseInt(_styles.width) * rotateOrigin[0];
+    let offsetWidth = parseInt(_opts.width) * rotateOrigin[0];
     let offsetHeight = textAllList.length * lineHeight * rotateOrigin[1];
     // 设置偏转中心
-    this.ctx.translate(parseInt(_styles.left) + offsetWidth, parseInt(_styles.top) + offsetHeight)
-    this.ctx.rotate(parseFloat(_styles.rotate) * Math.PI / 180);
+    this.ctx.translate(parseInt(_opts.left) + offsetWidth, parseInt(_opts.top) + offsetHeight)
+    this.ctx.rotate(parseFloat(_opts.rotate) * Math.PI / 180);
     // 循环绘制文本
     for (let i in textAllList) {
-      this.ctx.fillText(textAllList[i], -offsetWidth, -offsetHeight + i * lineHeight);
+      let textIndentWidth = 0
+      if (_opts.textIndent > 0 && Number(i) === 0) {
+        // 第一行要根据内容删除部分输出
+        textIndentWidth = this.ctx.measureText(textAllList[i].slice(0, _opts.textIndent)).width
+        textAllList[i] = textAllList[i].substr(_opts.textIndent)
+      }
+      this.ctx.fillText(textAllList[i], -offsetWidth + textIndentWidth, -offsetHeight + i * lineHeight);
     }
     this.ctx.setTransform(1, 0, 0, 1, 0, 0);
     this.ctx.restore();
+    console.log('drawText have been invoked')
     return this
   }
 
@@ -397,12 +485,28 @@ class Graffiti {
       stroke: false,
       clip: false
     }
-    Object.assign(_opts, opts)
+    Object.assign(_opts, opts, opts.style)
     _opts.left = parseFloat(_opts.left)
     _opts.top = parseFloat(_opts.top)
     _opts.width = parseFloat(_opts.width)
     _opts.height = parseFloat(_opts.height)
     _opts.radius = utils.formatRadius(_opts)
+    if (_opts.border > 0) {
+      this.drawRect({
+        left: _opts.left - _opts.border,
+        top: _opts.top - _opts.border,
+        width: _opts.width + _opts.border * 2,
+        height: _opts.height + _opts.border * 2,
+        border: 0,
+        borderColor: _opts.borderColor,
+        background: _opts.borderColor,
+        radius: _opts.radius.map(e => e > 0 ? (e + _opts.border) : e),
+        clip: false,
+        stroke: false,
+        fill: true
+      })
+    }
+    // 执行
     if (_opts.clip) {
       _opts.hollow = false;
     }
@@ -427,13 +531,13 @@ class Graffiti {
       this.ctx.fill()
     }
     if (_opts.stroke) {
-      console.log('borderColor', _opts)
       this.ctx.strokeStyle = _opts.borderColor
       this.ctx.stroke();
     }
     if (_opts.clip) {
       this.ctx.clip()
     }
+    console.log('drawRect have been invoked')
     return this;
   }
   /**
@@ -444,6 +548,13 @@ class Graffiti {
    * @memberof Graffiti
    */
   drawQrCode(opts = {}) {
+    if (opts.logoUrl && !opts.tmpUrl) {
+      downLoad.downLoad(opts.logoUrl, this.canvasNode).then(img => {
+        opts.tmpUrl = img
+        this.drawQrCode(opts)
+      }).catch(err => {});
+      return;
+    }
     let _opts = {
       left: 0, // 坐标x
       top: 0, // 坐标y
@@ -519,8 +630,59 @@ class Graffiti {
         }
       }
     }
+    // 判断是否有logo
+    if (opts.tmpUrl) {
+      const logoSize = 0.3;
+      this.drawImage({
+        type: "qrcodeLogo",
+        url: opts.logoUrl,
+        tmpUrl: opts.tmpUrl,
+        style: {
+          width: _opts.width * logoSize,
+          height: _opts.height * logoSize,
+          top: _opts.top + _opts.height * (1 - logoSize) / 2,
+          left: _opts.left + _opts.width * (1 - logoSize) / 2,
+          rotate: "0deg",
+          radius: [10, 10, 10, 10],
+          background: "#ffffff",
+          mode: "scaleToFill"
+        }
+      })
+    }
     this.ctx.restore();
+    console.log('drawQrCode have been invoked')
     return this;
+  }
+  getDrewData() {
+    return this.canvasNode.toDataURL('image/png', 1);
+  }
+  getImageUrl() {
+    let that = this;
+    let imageData = this.getDrewData()
+    return new Promise((resolve, reject) => {
+      let fileManager = wx.getFileSystemManager();
+      let fileName = Math.random() + '-' + Date.now() + '.png';
+      let filePath = wx.env.USER_DATA_PATH + '/canvas-' + fileName
+      console.log(filePath)
+      fileManager.writeFile({
+        filePath: filePath,
+        data: imageData.slice(22),
+        encoding: 'base64',
+        success: res => {
+          resolve({
+            status: 1,
+            msg: 'success',
+            tempFilePath: filePath
+          })
+        },
+        fail(err) {
+          reject({
+            status: 0,
+            msg: err.errMsg
+          })
+        }
+      })
+    });
   }
 }
 
