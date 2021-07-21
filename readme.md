@@ -2,6 +2,8 @@
 
 > 微信小程序 canvas 海报绘制插件
 
+<img src="https://img.shields.io/github/stars/ovenslove/Graffiti" alt="star" style="display:inline"><img src="https://img.shields.io/github/forks/ovenslove/Graffiti" alt="fork" style="display:inline"><img src="https://img.shields.io/github/issues/ovenslove/Graffiti" alt="issues" style="display:inline"><img src="https://img.shields.io/github/license/ovenslove/Graffiti" alt="mit" style="display:inline"><img src="https://img.shields.io/github/v/tag/ovenslove/Graffiti" alt="tag" style="display:inline">
+
 ### 版本更新
 
 * v1.0.1
