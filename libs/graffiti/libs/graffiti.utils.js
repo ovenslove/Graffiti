@@ -58,9 +58,77 @@ function formatRadius(opts = {}) {
   return radiusList;
 }
 
+/**
+ * @function formatBoxShadow
+ * @description 格式化盒阴影
+ * @param {*} [opts={}]
+ * @returns
+ */
+function formatBoxShadow(opts = {}) {
+  let boxShadow = opts.boxShadow
+  if (!boxShadow) {
+    return [0, 0, 0, "#000000"]
+  }
+  if (Array.isArray(boxShadow)) {
+    return boxShadow
+  }
+  boxShadow = boxShadow.split(' ')
+  if (boxShadow.length === 4) {
+    boxShadow[0] = parseFloat(boxShadow[0])
+    boxShadow[1] = parseFloat(boxShadow[1])
+    boxShadow[2] = parseFloat(boxShadow[2])
+  } else {
+    throw new Error('boxShadow 参数错误')
+  }
+  return boxShadow;
+}
+
+/**
+ * @function formatRotateOrigin
+ * @description 格式化旋转中心
+ * @param {*} [opts={}]
+ * @returns
+ */
+function formatRotateOrigin(opts = {}) {
+  let rotateOrigin = opts.rotateOrigin
+  if (!rotateOrigin) {
+    return [0, 0]
+  }
+  if (Array.isArray(rotateOrigin)) {
+    return rotateOrigin
+  }
+  rotateOrigin = rotateOrigin.split(' ');
+  if (rotateOrigin.length === 2) {
+    rotateOrigin = rotateOrigin.map(e => {
+      if (/[\d]%/g.test(e)) {
+        return parseFloat(e) / 100
+      } else {
+        switch (e) {
+          case 'left':
+          case 'top':
+            return 0;
+          case 'right':
+          case 'bottom':
+            return 1;
+          case 'center':
+          case 'middle':
+            return 0.5;
+          default:
+            return 0;
+        }
+      }
+    })
+  } else {
+    rotateOrigin = [0, 0]
+  }
+  return rotateOrigin;
+}
+
 export default {
   getSystemInfo,
   degree2radian,
   trim,
-  formatRadius
+  formatRadius,
+  formatBoxShadow,
+  formatRotateOrigin
 }

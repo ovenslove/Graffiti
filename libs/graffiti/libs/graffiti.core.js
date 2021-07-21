@@ -110,7 +110,7 @@ class Graffiti {
           this.onDrewHandle()
         }).catch(err => {
           this.log(err)
-          throw new Error('image download error')
+          throw new Error(err)
         })
         this.onReadyHandle()
       })
@@ -320,6 +320,7 @@ class Graffiti {
         borderColor: _opts.borderColor,
         background: _opts.background,
         radius: _opts.radius,
+        boxShadow: _opts.boxShadow,
         clip: true,
         stroke: false,
         fill: true
@@ -417,29 +418,7 @@ class Graffiti {
     // 计算文本垂直偏移量（行距）
     let lineHeight = parseFloat(_opts.lineHeight)
     // 处理旋转中心
-    let rotateOrigin = Array.isArray(_opts.rotateOrigin) ? _opts.rotateOrigin : (_opts.rotateOrigin && _opts.rotateOrigin.split(' ') || [0, 0])
-    rotateOrigin = rotateOrigin.map(e => {
-      if (/[\d]%/g.test(e)) {
-        return parseFloat(e) / 100
-      } else {
-        switch (e) {
-          case 'left':
-          case 'top':
-            return 0;
-            break;
-          case 'right':
-          case 'bottom':
-            return 1;
-            break;
-          case 'center':
-          case 'middle':
-            return 0.5;
-          default:
-            return 0;
-            break;
-        }
-      }
-    })
+    let rotateOrigin = utils.formatRotateOrigin(_opts)
     // 旋转偏移量
     let offsetWidth = parseInt(_opts.width) * rotateOrigin[0];
     let offsetHeight = textAllList.length * lineHeight * rotateOrigin[1];
@@ -484,7 +463,8 @@ class Graffiti {
       hollow: false,
       fill: true,
       stroke: false,
-      clip: false
+      clip: false,
+      boxShadow: [0, 0, 0, "#ffffff"]
     }
     Object.assign(_opts, opts, opts.style)
     _opts.left = parseFloat(_opts.left)
@@ -493,6 +473,7 @@ class Graffiti {
     _opts.height = parseFloat(_opts.height)
     _opts.border = parseFloat(_opts.border)
     _opts.radius = utils.formatRadius(_opts)
+    _opts.boxShadow = utils.formatBoxShadow(_opts)
     if (_opts.border > 0) {
       this.drawRect({
         left: _opts.left - _opts.border,
@@ -502,11 +483,13 @@ class Graffiti {
         border: 0,
         borderColor: _opts.borderColor,
         background: _opts.borderColor,
-        radius: _opts.radius.map(e => e > 0 ? (e + _opts.border) : e),
+        radius: _opts.radius,
+        boxShadow: _opts.boxShadow,
         clip: false,
         stroke: false,
         fill: true
       })
+      _opts.boxShadow = [0, 0, 0, "#ffffff"]
     }
     // 执行
     if (_opts.clip) {
@@ -527,6 +510,10 @@ class Graffiti {
     this.ctx.lineTo(_opts.left, _opts.top + _opts.radius[0]); // p8点
     this.ctx.arc(_opts.left + _opts.radius[0], _opts.top + _opts.radius[0], _opts.radius[0], PI, 3 * PI / 2, false); // c3点画1/4弧到p1
     this.ctx.closePath();
+    this.ctx.shadowOffsetX = _opts.boxShadow[0];
+    this.ctx.shadowOffsetY = _opts.boxShadow[1];
+    this.ctx.shadowBlur = _opts.boxShadow[2];
+    this.ctx.shadowColor = _opts.boxShadow[3];
     // 判断绘制类型
     if (_opts.fill) {
       this.ctx.fillStyle = _opts.background

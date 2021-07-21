@@ -1,7 +1,7 @@
 // libs/graffiti/graffiti.js
 import _ from './libs/graffiti.utils'
 import Graffiti from './libs/graffiti.core'
-import demoData from './data/data1'
+import demoData from './data/data2'
 Component({
   /**
    * 组件的属性列表
@@ -48,7 +48,7 @@ Component({
       this.setData({
         graffiti: new Graffiti({
           canvasId: this.data.canvasId,
-          debug: false
+          debug: true
         }, this).init(this.data.defaultConfig)
       })
       this.data.graffiti.onReady(() => {
