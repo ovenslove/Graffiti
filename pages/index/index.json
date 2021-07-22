@@ -1,6 +1,6 @@
 {
   "navigationBarTitleText":"Graffiti",
   "usingComponents": {
-    "graffiti":"../../libs/graffiti/graffiti"
+    "graffiti":"../../components/graffiti/graffiti"
   }
 }

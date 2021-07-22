@@ -24,7 +24,7 @@ SOFTWARE.
 "use strict"
 import downLoad from './graffiti.download'
 import utils from './graffiti.utils'
-const QRCode = require('../libs/graffiti.qrcode')
+const QRCode = require('./graffiti.qrcode')
 const PI = Math.PI
 class Graffiti {
   /**
@@ -35,6 +35,7 @@ class Graffiti {
   constructor(opts = {}, context = null) {
     if (!opts.canvasId) throw new Error('canvasId this is required')
     if (!context) throw new Error('parent context is required')
+    this.version = "1.0.2"
     this.ctx = null
     this.canvasNode = null
     this.sysInfo = utils.getSystemInfo()
@@ -464,6 +465,7 @@ class Graffiti {
       fill: true,
       stroke: false,
       clip: false,
+      isBorder: false,
       boxShadow: [0, 0, 0, "#ffffff"]
     }
     Object.assign(_opts, opts, opts.style)
@@ -474,23 +476,27 @@ class Graffiti {
     _opts.border = parseFloat(_opts.border)
     _opts.radius = utils.formatRadius(_opts)
     _opts.boxShadow = utils.formatBoxShadow(_opts)
-    if (_opts.border > 0) {
+    if (!_opts.isBorder) {
       this.drawRect({
         left: _opts.left - _opts.border,
         top: _opts.top - _opts.border,
         width: _opts.width + _opts.border * 2,
         height: _opts.height + _opts.border * 2,
-        border: 0,
+        border: _opts.border,
         borderColor: _opts.borderColor,
         background: _opts.borderColor,
         radius: _opts.radius,
         boxShadow: _opts.boxShadow,
+        rotate: _opts.rotate,
+        rotateOrigin: _opts.rotateOrigin,
         clip: false,
         stroke: false,
-        fill: true
+        fill: true,
+        isBorder: true,
       })
       _opts.boxShadow = [0, 0, 0, "#ffffff"]
     }
+    this.ctx.save()
     // 执行
     if (_opts.clip) {
       _opts.hollow = false;
@@ -498,6 +504,19 @@ class Graffiti {
     if (_opts.hollow) {
       this.ctx.globalCompositeOperation = 'destination-out'
     }
+    if (_opts.rotate) {
+      // 处理旋转中心
+      let rotateOrigin = utils.formatRotateOrigin(_opts)
+      // 旋转偏移量
+      let offsetWidth = _opts.left + parseInt(_opts.width) * rotateOrigin[0];
+      let offsetHeight = _opts.top + parseInt(_opts.height) * rotateOrigin[1];
+      // 设置偏转中心
+      this.ctx.translate(offsetWidth, offsetHeight)
+      this.ctx.rotate(parseFloat(_opts.rotate) * Math.PI / 180);
+      _opts.left = _opts.left - offsetWidth
+      _opts.top = _opts.top - offsetHeight
+    }
+
     this.ctx.lineWidth = _opts.border;
     this.ctx.beginPath();
     this.ctx.moveTo(_opts.left + _opts.radius[0], _opts.top); //p1点
@@ -527,6 +546,8 @@ class Graffiti {
       this.ctx.clip()
     }
     this.log('drawRect have been invoked')
+    this.ctx.setTransform(1, 0, 0, 1, 0, 0);
+    this.ctx.restore()
     return this;
   }
   /**

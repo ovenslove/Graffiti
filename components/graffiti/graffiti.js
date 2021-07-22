@@ -1,7 +1,7 @@
 // libs/graffiti/graffiti.js
-import _ from './libs/graffiti.utils'
-import Graffiti from './libs/graffiti.core'
-import demoData from './data/data2'
+import _ from '../../libs/graffiti/graffiti.utils'
+import Graffiti from '../../libs/graffiti/graffiti.core'
+import demoData from './data/data'
 Component({
   /**
    * 组件的属性列表

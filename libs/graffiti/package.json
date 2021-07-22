@@ -1,0 +1,23 @@
+{
+  "name": "graffiti",
+  "version": "1.0.2",
+  "description": "微信小程序端-海报绘制插件",
+  "main": "graffiti.core.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/ovenslove/Graffiti.git"
+  },
+  "keywords": [
+    "海报",
+    "小程序"
+  ],
+  "author": "ovenslove.liu",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/ovenslove/Graffiti/issues"
+  },
+  "homepage": "https://github.com/ovenslove/Graffiti#readme"
+}
