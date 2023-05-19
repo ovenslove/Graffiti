@@ -1,7 +1,7 @@
 // libs/graffiti/graffiti.js
 import _ from '../../libs/graffiti/graffiti.utils'
 import Graffiti from '../../libs/graffiti/graffiti.core'
-import demoData from './data/data'
+import demoData from './data/data1'
 Component({
   /**
    * 组件的属性列表
@@ -52,10 +52,11 @@ Component({
         }, this).init(this.data.defaultConfig)
       })
       this.data.graffiti.onReady(() => {
-        console.log('onReady')
+        console.log('onReady', this.data.graffiti)
+
       })
-      this.data.graffiti.onDrew(() => {
-        console.log('onDrew')
+      this.data.graffiti.onDraw(() => {
+        console.log('onDraw')
       });
     },
     // 在组件在视图层布局完成后执行	-	1.6.3
@@ -83,6 +84,34 @@ Component({
    * 组件的方法列表
    */
   methods: {
+    handleCreateWaterMark() {
+      for (let i = 0; i < 10; i++) {
+        for (let j = 0; j < 10; j++) {
+          let left = i * 200
+          let top = j * 200
+          this.data.graffiti.drawText({
+            "type": "text",
+            "text": "黄嘉杰1234",
+            "style": {
+              "left": left + "px",
+              "top": top + "px",
+              "width": "200px",
+              "textIndent": "0",
+              "maxLines": "1",
+              "fontSize": "32px",
+              "fontFamily": "PingFangSC-Regular, PingFang SC",
+              "fontWeight": "500",
+              "color": "#ffffff",
+              "lineHeight": "22px",
+              "textAlign": "left",
+              "textBaseline": "top",
+              "rotate": Math.random() * 100,
+            }
+          })
+        }
+      }
+
+    },
     handleSaveImage(e) {
       this.data.graffiti.getImageUrl().then(res => {
         wx.saveImageToPhotosAlbum({

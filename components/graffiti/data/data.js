@@ -2,7 +2,7 @@ const data = {
   width: "320px",
   height: "375px",
   background: "#eeeeee",
-  radius: "0px 0px 0px 0px",
+  radius: "10px 0px 0px 0px",
   views: [{
     type: 'rect',
     style: {
@@ -10,12 +10,12 @@ const data = {
       top: "50px",
       width: "200px",
       height: "200px",
-      background: "red",
-      radius: "5px",
-      border: "10px",
+      background: "pink",
+      radius: "100px",
+      border: "4px",
       borderColor: "#ffffff",
-      boxShadow: "0px 0px 10px #000000",
-      rotate: "45deg",
+      boxShadow: "0px 0px 1px #000000",
+      rotate: "0deg",
       rotateOrigin: "center center"
     }
   }, {
@@ -26,7 +26,7 @@ const data = {
       top: "150px",
       toLeft: "320px",
       toTop: "150px",
-      color: "#cccccc",
+      color: "#ff00ff",
       lineType: 'line',
       lineCap: "butt",
       lineJoin: "miter",
@@ -41,7 +41,7 @@ const data = {
       top: "0px",
       toLeft: "150px",
       toTop: "375px",
-      color: "#cccccc",
+      color: "#ff00ff",
       lineType: 'line',
       lineCap: "butt",
       lineJoin: "miter",

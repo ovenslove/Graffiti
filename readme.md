@@ -27,8 +27,8 @@ this.data.graffiti.onReady(() => {
   console.log('onReady')
 })
 // Graffiti初始化参数-绘制完成
-this.data.graffiti.onDrew(() => {
-  console.log('onDrew')
+this.data.graffiti.onDraw(() => {
+  console.log('onDraw')
 });
 ```
 
@@ -312,7 +312,7 @@ this.data.graffiti.onDrew(() => {
 
    
 
-8. Graffiti.getDrewData()
+8. Graffiti.getDrawData()
 
    > 获取画板数据
    
@@ -321,12 +321,12 @@ this.data.graffiti.onDrew(() => {
    | quality | 是       | 1      | 图片输出质量 | v1.0.1   |
    
    ```js
-    const imageData = this.data.graffiti.getDrewData(1)
+    const imageData = this.data.graffiti.getDrawData(1)
    ```
    
    
    
-9. Graffiti.getDrewData()
+9. Graffiti.getDrawData()
 
    > 获取图片临时地址
 

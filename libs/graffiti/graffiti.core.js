@@ -50,7 +50,7 @@ class Graffiti {
     this.DESIGN_W = 750
     this.DESIGN_H = 1000
     this.onReadyHandle = () => {}
-    this.onDrewHandle = () => {}
+    this.onDrawHandle = () => {}
     this.data = {}
     return this;
   }
@@ -108,7 +108,7 @@ class Graffiti {
                 break;
             }
           }
-          this.onDrewHandle()
+          this.onDrawHandle()
         }).catch(err => {
           this.log(err)
           throw new Error(err)
@@ -128,13 +128,13 @@ class Graffiti {
     this.onReadyHandle = callback
   }
   /**
-   * @function onDrew
+   * @function onDraw
    * @description 初始化配置绘制完成-生命周期
    * @param {*} [callback=() => {}]
    * @memberof Graffiti
    */
-  onDrew(callback = () => {}) {
-    this.onDrewHandle = callback
+  onDraw(callback = () => {}) {
+    this.onDrawHandle = callback
   }
   /**
    * @function initDrawingBoard
@@ -204,6 +204,7 @@ class Graffiti {
    * @memberof Graffiti
    */
   drawLine(opts = {}) {
+    console.log(opts)
     let _opts = {
       lineWidth: 2,
       left: 0,
@@ -664,13 +665,13 @@ class Graffiti {
     return this;
   }
   /**
-   * @function getDrewData
+   * @function getDrawData
    * @description 获取画板数据（base64格式）
    * @param {number} [quality=1]
    * @returns
    * @memberof Graffiti
    */
-  getDrewData(quality = 1) {
+  getDrawData(quality = 1) {
     return this.canvasNode.toDataURL('image/png', quality);
   }
   /**
@@ -680,7 +681,7 @@ class Graffiti {
    * @memberof Graffiti
    */
   getImageUrl() {
-    let imageData = this.getDrewData()
+    let imageData = this.getDrawData()
     return new Promise((resolve, reject) => {
       let fileManager = wx.getFileSystemManager();
       let fileName = Math.random() + '-' + Date.now() + '.png';

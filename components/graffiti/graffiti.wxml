@@ -1,5 +1,6 @@
 <!--libs/graffiti/graffiti.wxml-->
 <view class="graffiti__container">
   <canvas class="canvas__container" id="{{canvasId}}" type="2d" style="width:{{defaultConfig.width}};height:{{defaultConfig.height}};"></canvas>
+  <button class="graffiti__btn" bindtap="handleCreateWaterMark">生成水印</button>
   <button class="graffiti__btn" bindtap="handleSaveImage">保存图片</button>
 </view>
